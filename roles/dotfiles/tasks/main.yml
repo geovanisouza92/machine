@@ -1,0 +1,33 @@
+---
+- name: Configure local variables
+  set_fact:
+    _user: "{{ dotfiles_user | default(lookup(env, 'USER')) }}"
+    _home: "{{ dotfiles_home | default(lookup(env, 'HOME')) }}"
+    _dir: "/tmp/dotfiles"
+
+- name: Create temp directory for cloning
+  file:
+    path: "{{ _dir }}"
+    state: directory
+    owner: "{{ _user }}"
+    group: "{{ _user }}"
+    mode: 0755
+
+- name: Get dotfiles
+  git:
+    repo: https://github.com/geovanisouza92/dotfiles.git
+    dest: "{{ _dir }}"
+    version: master
+    update: "{{ dotfiles_update | bool }}"
+  become: yes
+  become_user: "{{ _user }}"
+
+- name: Copy dotfiles
+  file:
+    src: "{{ item }}"
+    dest: "{{ _home }}/.{{ item | basename }}"
+    force: yes
+  with_fileglob:
+    - "{{ _dir }}/*"
+  become: yes
+  become_user: "{{ _user }}"

@@ -1,0 +1,8 @@
+---
+- name: Install PIP packages
+  pip:
+    name: "{{ item }}"
+    extra_args: --user
+  loop:
+    - awscli
+    - powerline-shell

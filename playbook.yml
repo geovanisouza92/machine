@@ -1,0 +1,10 @@
+---
+- name: Provisioning machine
+  hosts: "{{ target_host | default('localhost') }}"
+  connection: local
+  roles:
+    - os-config
+    - os-packages
+    - pip-packages
+    # - dotfiles
+    # - chrome

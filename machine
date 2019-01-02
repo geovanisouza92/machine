@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set -ex
+
+_bootstrap()
+{
+  sudo apt update
+
+  sudo apt install --no-install-recommends -y \
+    ca-certificates \
+    curl \
+    python \
+    python-apt \
+    software-properties-common
+
+  if ! dpkg-query --show ansible ; then
+    sudo add-apt-repository --yes 'ppa:ansible/ansible-2.3'
+    sudo apt update
+    sudo apt install --no-install-recommends -y ansible
+  fi
+
+  ansible --version
+}
+
+_run()
+{
+  ansible-playbook --version
+
+  ansible-playbook -b -K -v playbook.yml -i inventory.ini "$@"
+}
+
+case $1 in
+  bootstrap)
+    _bootstrap
+    ;;
+
+  run)
+    _run
+    ;;
+
+  *)
+    echo "Usage: machine ( bootstrap | run )"
+    echo "  bootstrap - Install needed dependencies for provisioning"
+    echo "        run - Execute provisioning"
+    ;;
+esac

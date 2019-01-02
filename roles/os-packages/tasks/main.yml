@@ -1,0 +1,22 @@
+---
+- name: Update APT cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  loop:
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - wget
+    - python
+    - python-pip
+    - build-essential
+    - git
+    - fonts-powerline
+    - jq

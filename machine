@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 _bootstrap()
 {
@@ -31,10 +31,12 @@ _run()
 
 case $1 in
   bootstrap)
+    set -x
     _bootstrap
     ;;
 
   run)
+    set -x
     _run
     ;;
 

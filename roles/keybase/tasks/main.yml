@@ -1,0 +1,8 @@
+---
+- name: Check if Keybase is installed
+  shell: dpkg-query --show keybase || true
+  register: keybase_check
+  changed_when: false
+
+- include: install.yml
+  when: "'no packages found matching' in keybase_check.stderr"

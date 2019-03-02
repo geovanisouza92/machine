@@ -1,0 +1,36 @@
+---
+- name: Install repository key
+  apt_key:
+    url: "{{ keybase_repo_key }}"
+    state: present
+    keyring: /etc/apt/trusted.gpg.d/keybase.gpg
+
+- name: Download Keybase deb
+  get_url:
+    url: "{{ keybase_url }}"
+    dest: /tmp/keybase.deb
+
+- name: Get Keybase dependencies
+  shell: >
+    dpkg --info /tmp/keybase.deb
+    | grep '^ Depends:'
+    | sed -e 's/ Depends://' -e 's/, /\n/g'
+    | aws '{ print $1 }'
+    | tr '\n' '@'
+  register: keybase_deps_list
+  changed_when: false
+
+- name: Define variable with dependencies list
+  set_fact:
+    keybase_deps: "{{ keybase_deps_list.stdout.rstrip('@').split('@') }}"
+
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ keybase_deps }}"
+
+- name: Install Keybase
+  apt:
+    deb: /tmp/keybase.deb
+    state: present

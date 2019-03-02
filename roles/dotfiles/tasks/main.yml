@@ -3,7 +3,7 @@
   set_fact:
     _user: "{{ dotfiles_user | default(lookup(env, 'USER')) }}"
     _home: "{{ dotfiles_home | default(lookup(env, 'HOME')) }}"
-    _dir: "/tmp/dotfiles"
+    _dir: "{{ dotfiles_dir | default(lookup(env, 'HOME') + '/.rc') }}"
 
 - name: Create temp directory for cloning
   file:
@@ -27,6 +27,7 @@
     src: "{{ item }}"
     dest: "{{ _home }}/.{{ item | basename }}"
     force: yes
+    state: link
   with_fileglob:
     - "{{ _dir }}/*"
   become: yes

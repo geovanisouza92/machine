@@ -7,4 +7,6 @@
     - os-packages
     - pip-packages
     # - dotfiles
-    # - chrome
+    - chrome
+    - virtualbox
+    - keybase

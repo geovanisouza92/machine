@@ -1,30 +1,8 @@
 ---
-- name: Download stable version
-  get_url:
-    url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    dest: /tmp/chrome.deb
-
-- name: Get Chrome dependencies
-  shell: >
-    dpkg --info /tmp/chrome.deb
-    | grep '^ Depends:'
-    | sed -e 's/ Depends://' -e 's/, /\n/g'
-    | aws '{ print $1 }'
-    | tr '\n' '@'
-  register: chrome_deps_list
+- name: Check if Chrome is installed
+  shell: dpkg-query --show google-chrome-stable || true
+  register: chrome_check
   changed_when: false
 
-- name: Define variable with dependencies list
-  set_fact:
-    chrome_deps: "{{ chrome_deps_list.stdout.rstrip('@').split('@') }}"
-
-- name: Install dependencies
-  apt:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ chrome_deps }}"
-
-- name: Install Chrome
-  apt:
-    deb: /tmp/chrome.deb
-    state: present
+- include: install.yml
+  when: "'no packages found matching' in chrome_check.stderr"
